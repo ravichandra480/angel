@@ -1,0 +1,50 @@
+@use "sass:map";
+@use '@angular/material' as mat;
+@include mat.core();
+
+mat-card {
+  margin: 10px 0;
+  width: 80%;
+}
+
+.question {
+  float: left;
+  background: map.get(mat.define-palette(mat.$indigo-palette), 100);
+}
+
+.answer {
+  float: right;
+  background: map.get(mat.define-palette(mat.$pink-palette), 100);
+}
+
+.skeleton-box {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  overflow: hidden;
+  background-color: map.get(mat.define-palette(mat.$pink-palette), 500);
+
+  &::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+        90deg,
+        rgba(map.get(mat.define-palette(mat.$pink-palette), 200), 0) 0,
+        rgba(map.get(mat.define-palette(mat.$pink-palette), 200), 0.2) 20%,
+        rgba(map.get(mat.define-palette(mat.$pink-palette), 200), 0.5) 60%,
+        rgba(map.get(mat.define-palette(mat.$pink-palette), 200), 0)
+    );
+    animation: shimmer 5s infinite;
+    content: '';
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}

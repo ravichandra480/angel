@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Anta'
+);
+$custom-level: mat.define-typography-level(
+  $font-family: 'Madimi One',
+  $font-weight: 400,
+  $font-size: 1rem,
+  $line-height: 1,
+  $letter-spacing: normal,
+);
+$theme: mat.define-light-theme((
+  typography: $custom-typography,
+));
+@include mat.typography-hierarchy($custom-typography);
+@include mat.all-component-themes($theme);
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Madimi One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background: #777;
+}

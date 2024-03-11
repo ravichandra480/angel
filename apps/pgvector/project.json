@@ -1,0 +1,18 @@
+{
+  "name": "pgvector",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/pgvector",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "",
+        "outputPath": "dist/apps/pgvector",
+        "tsConfig": ""
+      }
+    }
+  }
+}

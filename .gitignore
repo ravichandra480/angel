@@ -39,3 +39,13 @@ testem.log
 Thumbs.db
 
 .nx/cache
+
+# Next.js
+.next
+out
+.angular
+
+.vscode
+.idea
+
+uploads

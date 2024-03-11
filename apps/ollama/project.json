@@ -1,0 +1,18 @@
+{
+  "name": "ollama",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/ollama/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:swc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "apps/ollama/src/main.ts",
+        "outputPath": "dist/apps/ollama",
+        "tsConfig": "apps/ollama/tsconfig.app.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "api-next",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/api-next",
+  "projectType": "application",
+  "targets": {},
+  "tags": []
+}

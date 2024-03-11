@@ -1,0 +1,11 @@
+<mat-card [ngClass]="type === 'question' ? 'question' : 'answer'">
+  <mat-card-content>
+    <p *ngIf="type!=='loading'">{{answer}}</p>
+    <p *ngIf="type === 'loading'">
+      <span class="skeleton-box" style="width:80%;"></span>
+      <span class="skeleton-box" style="width:90%;"></span>
+      <span class="skeleton-box" style="width:83%;"></span>
+      <span class="skeleton-box" style="width:80%;"></span>
+    </p>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,25 @@
+mat-form-field {
+  width: 100%;
+}
+.input_fileupload--hidden{
+  display:none;
+  height: 0;
+}
+.question-form {
+  display: flex;
+  &__question {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+  &__files {
+    &__loading {
+      display: flex;
+      width: 210px;
+      justify-content: space-between;
+      align-items: center;
+      margin-right: 10px;
+    }
+  }
+}

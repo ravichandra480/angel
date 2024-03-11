@@ -1,0 +1,20 @@
+<div class="container">
+  <header>
+    <angel-header></angel-header>
+  </header>
+  <main class="content">
+    <ul class="answers" #chat>
+      <li *ngFor="let chat of chats">
+        <angel-answer [answer]="chat.text" [type]="chat.type"></angel-answer>
+      </li>
+      <li *ngIf="isLoading">
+        <angel-answer [answer]="''" [type]="'loading'"></angel-answer>
+      </li>
+    </ul>
+    <div class="question">
+      <angel-question (newAnswerEvent)="addAnswer($event)"
+                      (isLoading)="loadingCheck($event)">
+      </angel-question>
+    </div>
+  </main>
+</div>

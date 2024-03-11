@@ -1,0 +1,56 @@
+@use "sass:map";
+@use '@angular/material' as mat;
+@include mat.core();
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'header'
+    'main';
+}
+.header {
+  grid-area: header;
+  margin-bottom: 5px;
+}
+.content {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: 1fr auto;
+  width: 680px;
+  margin: 0 auto;
+}
+.loading-height {
+  height: calc(100vh - 102px);
+}
+.answers {
+  overflow: auto;
+  scrollbar-width: thin;
+  list-style: none;
+  margin: 10px 0 10px 0;
+  padding: 0 10px 0 0;
+  height: 70vh;
+}
+.status {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 18px;
+  //&__loading {
+  //  color: map.get(mat.define-palette(mat.$blue-palette), 900);
+  //}
+  //&__done {
+  //  color: map.get(mat.define-palette(mat.$green-palette), 900);
+  //}
+}
+.question {
+  width: 100%;
+  padding-right: 5px;
+}
+
+angel-loading {
+  display: block;
+  height: 40px;
+}
+

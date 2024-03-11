@@ -1,0 +1,59 @@
+version: "3"
+
+volumes:
+  llmchat-db-docker:
+    external: true
+services:
+  ui:
+    hostname: ui
+    build:
+      context: .
+      dockerfile: apps/ui/Dockerfile
+    image: "askme/ui"
+    container_name: "ui"
+
+    # To access via localhost, and prevent conflicts with our Postgres
+    ports:
+      - "80:80"
+    restart: unless-stopped
+  api:
+    hostname: api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: "askme/api"
+    container_name: "api"
+
+    # To access via localhost, and prevent conflicts with our Postgres
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+  postgres:
+    hostname: postgres
+    build:
+      context: .
+      dockerfile: apps/pgvector/Dockerfile
+    image: "llmchat-db"
+    container_name: "postgres"
+    environment:
+      POSTGRES_DB: "llmchat"
+      POSTGRES_USER: "locallm"
+      POSTGRES_PASSWORD: "locallm"
+      PGDATA: "/data/llmchat-db"
+    volumes:
+      - "llmchat-db-docker:/data/llmchat-db"
+
+    # To access via localhost, and prevent conflicts with our Postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - .:/code
+      - ./ollama/ollama:/root/.ollama
+    container_name: ollama
+    tty: true
+    restart: always
