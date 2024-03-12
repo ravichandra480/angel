@@ -80,7 +80,7 @@ async function main(userQ: string) {
   const config = getPgVectorConfig();
   const embeddings = getOllamaEmbeddings();
   const ollamaLlm = new Ollama({
-    baseUrl:"http://localhost:11434",
+    baseUrl:"http://ollama:11434",
     model:"tinydolphin"
   });
   const pgvectorStore = await PGVectorStore.initialize(
