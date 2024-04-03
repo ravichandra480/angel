@@ -6,23 +6,27 @@ import { TextLoader } from "langchain/document_loaders/fs/text";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { PoolConfig } from "pg";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import {PromptTemplate} from "@langchain/core/prompts";
-import {StringOutputParser} from "@langchain/core/output_parsers"
+import { PromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers"
 import { Ollama } from "@langchain/community/llms/ollama";
 
 const host = process.env.HOST ?? '0.0.0.0';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const upload = multer({ dest: 'uploads/' })
+const ollamaHost = process.env.OLLAMA_HOST ?? 'ollama';
+const ollamaPort = process.env.OLLAMA_PORT ?? '11434';
+const postgresHost = process.env.POSTGRES_HOST ?? 'postgres';
+const postgresPort = process.env.POSTGRES_PORT ?? 5432;
+const postgresDb = process.env.POSTGRES_DB ?? 'llmchat';
+const postgresUser = process.env.POSTGRES_USER ?? 'locallm';
+const postgresPassword = process.env.POSTGRES_PASSWORD ?? 'locallm';
 
 const app = express();
 
-app.post('/api/datasets', upload.single('file'), async (req: any, res) => {
-  console.log('datasets api called');
+app.post('/api/datasets', upload.single('file'), async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   try {
-    console.log('req.file', req.file);
-    console.log('req.file', req.body);
     await trainDataSets(`${req.file.destination}${req.file.filename}`, req.file.mimetype);
     res.send({ file: req.file, body: req.body });
   } catch (e) {
@@ -31,12 +35,12 @@ app.post('/api/datasets', upload.single('file'), async (req: any, res) => {
   }
 });
 app.get('/api/ask', async (req: any, res) => {
-  console.log('api called');
+  console.log('api called', ollamaHost);
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   console.log('chunks', req.query.q);
   try {
-    const chunks = await main(req.query.q);
+    const chunks = await ask(req.query.q);
     console.log(chunks);
     res.send({ message: chunks });
   } catch (e) {
@@ -50,7 +54,6 @@ app.listen(port, host, () => {
 });
 
 async function trainDataSets(docPath: string, type: string) {
-  console.log('type', type)
   const config = getPgVectorConfig();
   const embeddings = getOllamaEmbeddings();
   let loader: PDFLoader | TextLoader;
@@ -76,25 +79,24 @@ async function trainDataSets(docPath: string, type: string) {
   await pgvectorStore.end();
 }
 
-async function main(userQ: string) {
+async function ask(userQ: string) {
   const config = getPgVectorConfig();
   const embeddings = getOllamaEmbeddings();
-  const ollamaLlm = new Ollama({
-    baseUrl:"http://ollama:11434",
-    model:"tinydolphin"
-  });
+  const ollamaLlm = getOllama();
   const pgvectorStore = await PGVectorStore.initialize(
     embeddings,
     config
   );
 
   const userQuestion = userQ;
-  const simpleQuestionPrompt = PromptTemplate.fromTemplate(`
-  For following user question convert it into a standalone question
-  {userQuestion}
+  const prompt = PromptTemplate.fromTemplate(`
+    For following user question convert it into a standalone question
+    {userQuestion}
   `);
-  const simpleQuestionChain = simpleQuestionPrompt.pipe(ollamaLlm).pipe(new StringOutputParser()).pipe(pgvectorStore.asRetriever());
-  const documents = await simpleQuestionChain.invoke({
+  const questionChain = prompt.pipe(ollamaLlm)
+    .pipe(new StringOutputParser())
+    .pipe(pgvectorStore.asRetriever());
+  const documents = await questionChain.invoke({
     userQuestion: userQuestion
   });
   const combinedDocs = combineDocuments(documents);
@@ -125,11 +127,11 @@ function getPgVectorConfig() {
   return {
     postgresConnectionOptions: {
       type: "postgres",
-      host: "postgres",
-      port: 5432,
-      user: "locallm",
-      password: "locallm",
-      database: "llmchat",
+      host: postgresHost,
+      port: postgresPort,
+      user: postgresUser,
+      password: postgresPassword,
+      database: postgresDb,
     } as PoolConfig,
     tableName: "langchain",
     columns: {
@@ -141,9 +143,16 @@ function getPgVectorConfig() {
   };
 }
 
-function getOllamaEmbeddings() {
+function getOllamaEmbeddings(): OllamaEmbeddings {
   return new OllamaEmbeddings({
-    model: "tinydolphin", // default value
-    baseUrl: "http://ollama:11434", // default value
+    model: "tinydolphin",
+    baseUrl: `http://${ollamaHost}:${ollamaPort}`,
+  });
+}
+
+function getOllama(): Ollama {
+  return new Ollama({
+    model: "tinydolphin",
+    baseUrl: `http://${ollamaHost}:${ollamaPort}`,
   });
 }

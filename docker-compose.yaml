@@ -11,8 +11,6 @@ services:
       dockerfile: apps/ui/Dockerfile
     image: "askme/ui"
     container_name: "ui"
-
-    # To access via localhost, and prevent conflicts with our Postgres
     ports:
       - "80:80"
     restart: unless-stopped
@@ -23,8 +21,14 @@ services:
       dockerfile: apps/api/Dockerfile
     image: "askme/api"
     container_name: "api"
-
-    # To access via localhost, and prevent conflicts with our Postgres
+    environment:
+      OLLAMA_HOST: "llmchat"
+      OLLAMA_PORT: "11434"
+      POSTGRES_HOST: "postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "llmchat"
+      POSTGRES_USER: "locallm"
+      POSTGRES_PASSWORD: "locallm"
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -36,14 +40,12 @@ services:
     image: "llmchat-db"
     container_name: "postgres"
     environment:
-      POSTGRES_DB: "llmchat"
-      POSTGRES_USER: "locallm"
-      POSTGRES_PASSWORD: "locallm"
-      PGDATA: "/data/llmchat-db"
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER_NAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA_PATH}
     volumes:
-      - "llmchat-db-docker:/data/llmchat-db"
-
-    # To access via localhost, and prevent conflicts with our Postgres
+      - ${POSTGRES_VOLUMES}
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -52,8 +54,8 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - .:/code
-      - ./ollama/ollama:/root/.ollama
+      - ${OLLAMA_VOLUME_1}
+      - ${OLLAMA_VOLUME_2}
     container_name: ollama
     tty: true
     restart: always
